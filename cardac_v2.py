@@ -225,6 +225,8 @@ def button1(channel):
                 system("{0} audtool playback-stop".format(env))  # stop on longpress
                 break
         elif i == 39:
+            system("{0} audtool shutdown".format(env))  # reboot on very long press (2+s)
+            system("aplay /home/pi/reboot.wav")
             try:
                 global running
                 running = 0
@@ -232,14 +234,11 @@ def button1(channel):
                 draw.rectangle((0, 0, width, height), outline=0, fill=0)
                 disp.image(image)
                 disp.display()
-                draw.text((x + 5, top + 30), 'OFFLINE', font=font, fill=255)
+                draw.text((x + 5, top + 20), 'OFFLINE', font=font, fill=255)
                 disp.image(image)
                 disp.display()
             except:
                 pass
-
-            system("{0} audtool shutdown".format(env))  # reboot on very long press (2+s)
-            system("aplay /home/pi/reboot.wav")
             system("sudo reboot")
 
 def button2(channel):   #PREVIOUS
@@ -310,6 +309,9 @@ def button4(channel):
                 break
 
         elif i == 39:  # shut down on very long press
+             system("{0} audtool shutdown".format(env))
+             system("aplay /home/pi/shutdown.wav")
+
              try:
                  global running
                  running = 0
@@ -317,14 +319,12 @@ def button4(channel):
                  draw.rectangle((0, 0, width, height), outline=0, fill=0)
                  disp.image(image)
                  disp.display()
-                 draw.text((x + 5, top + 30), 'OFFLINE', font=font, fill=255)
+                 draw.text((x + 5, top + 20), 'OFFLINE', font=font, fill=255)
                  disp.image(image)
                  disp.display()
              except:
                  pass
 
-             system("{0} audtool shutdown".format(env))
-             system("aplay /home/pi/shutdown.wav")
              system("sudo shutdown -h now")
 
 GPIO.add_event_detect(17, GPIO.FALLING, callback=button1, bouncetime=400)
