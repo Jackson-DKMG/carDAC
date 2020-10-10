@@ -1,0 +1,56 @@
+#!/bin/sh -e
+
+### BEGIN INIT INFO
+# Provides:          cardac
+# Required-Start:    $syslog
+# Required-Stop:     $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Audacious controller
+# Description:       Use the attached buttons to control Audacious.
+### END INIT INFO
+
+PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin
+
+
+status() {
+[ -z "`ps aux | grep "cardac" | grep "python3" | grep -v grep`" ] && return 0 || return 1
+return $?
+}
+
+start() {
+#/usr/bin/dbus-run-session /usr/bin/python3 -i /home/pi/cardac.py &
+/sbin/runuser -l pi -c "/home/pi/cardac.py &"
+}
+
+case "$1" in
+  start)
+    status
+    case $? in
+	0) start && echo 'Started'
+	;;
+        1) echo 'Cardac is already running'
+	;;
+    esac
+    ;;
+  stop)
+    echo "Stopping Cardac"
+    for i in $(ps aux| grep "cardac" | grep "python3" | grep -v grep | awk -F ' ' '{print $2}'); do kill $i; done
+    ;;
+ status)
+   status
+   case $? in
+       0)  echo "Offline"
+	;;
+       1)  echo "Running"
+	;;
+   esac		
+    ;;
+  *)
+    echo "Usage: /etc/init.d/cardac {start|stop|status}"
+    exit 1
+    ;;
+esac
+
+exit 0
+
