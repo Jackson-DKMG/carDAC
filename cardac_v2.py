@@ -118,12 +118,17 @@ class displaySong(Thread):
                     disp.display()
 
                     # should get something like 'Band - Album - Song'. Split to keep band and song
-                    band = s.split('-')[0].rstrip()  # remove trailing space
-                    # band will probably never be blank, but perhaps the song will. Handle the exception if so.
+                    band = s.split(' -')[0].rstrip()  # remove trailing space. If the band name contains a -, the added space allows to get the full name.
+                    # band will probably never be blank, but perhaps the song will (if no Album field for example. Handle the exception if so.
                     try:
-                        song = s.split('-')[2].lstrip()  # remove initial space
-                    except IndexError:
-                        song = ''
+                        song = s.split('- ')[2].lstrip()  # remove initial space (adding the extra space after the ' allows to get full title in case
+                        #it includes the track number, e.g. "07-damage done"
+                    except IndexError: #there should only be IndexError exceptions here.
+                        try:
+                            song = s.split('- ')[1].lstrip() #if no Album, then song title is probably at index 1
+                        except IndexError:
+                            song = ''
+                            pass
                         pass
                     # got room for 12 characters with this font, and 4 rows. Split each string to occupy 2 rows if length is more than 12.
                     if len(band) > 12:
@@ -177,6 +182,58 @@ except:
     pass
 
 ######### END DISPLAY SONG ############################
+
+######### START MANUAL DISPLAY SONG ###################
+
+def manualSongUpdate():
+    try:
+            s = check_output(["{0} audtool current-song".format(env)], shell=True).decode('utf_8').rstrip()
+            # reset the display
+            draw.rectangle((0, 0, width, height), outline=0, fill=0)
+            disp.image(image)
+            disp.display()
+            band = s.split(' -')[0].rstrip()
+            try:
+                song = s.split('- ')[
+                    2].lstrip()
+            except IndexError:
+                try:
+                    song = s.split('- ')[1].lstrip()
+                except IndexError:
+                    song = ''
+                    pass
+                pass
+            if len(band) > 12:
+                band1 = band[0:12]
+                if band[11] == ' ':
+                    band2 = band[
+                            12:24]  # if longer than 24 characters, will be truncated anyway, no point keeping the extra stuff.
+                else:
+                    band2 = band[13:24]
+                draw.text((x, top), band1, font=font3, fill=255)
+                draw.text((x, top + 15), band2, font=font3, fill=255)
+            else:
+                draw.text((x, top + 10), band, font=font3, fill=255)
+            if len(song) > 12:
+                song1 = song[0:12]
+                if len(song) > 12:
+                    song1 = song[0:12]
+                if song[11] == ' ':
+                    song2 = song[
+                            12:24]  # if longer than 24 characters, will be truncated anyway, no point keeping the extra stuff.
+                else:
+                    song2 = song[13:24]
+                draw.text((x, top + 30), song1, font=font3, fill=255)
+                draw.text((x, top + 45), song2, font=font3, fill=255)
+            else:
+                draw.text((x, top + 40), song, font=font3, fill=255)
+
+            disp.image(image)
+            disp.display()  # display all the lines
+
+    except:  #if any exception (like the display being used by the automatic update thread), just abort. Will update 5s later anyway.
+        pass
+
 
 playlistLength = int(check_output(["{0} audtool playlist-length".format(env)], shell=True).decode('utf_8').rstrip())
 
@@ -260,6 +317,8 @@ def button2(channel):   #PREVIOUS
         elif i == 29:                  #on very long press, jump to first item in playlist
                 system("{0} audtool playlist-jump 1".format(env))
                 break
+    #update the display manually. It may collide with the update thread however, to check.
+    manualSongUpdate()
 
 def button3(channel):   #NEXT
     #print("button 3")
@@ -279,6 +338,7 @@ def button3(channel):   #NEXT
         elif i == 29:                  #on very long press, jump to last item in playlist
                 system("{0} audtool playlist-jump {1}".format(env, playlistLength))
                 break
+    manualSongUpdate()
 
 def button4(channel):
     #print("button 4")
@@ -300,6 +360,8 @@ def button4(channel):
                 system("{0} audtool playback-stop".format(env))
                 system("{0} audtool set-current-playlist {1}".format(env, playlist))
                 system("{0} audtool playback-playpause".format(env))
+
+                manualSongUpdate()
 
                 try:            #not sure this try block is useful, there is one in the function itself.
                    addTracks(playlist)
