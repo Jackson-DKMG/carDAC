@@ -61,17 +61,18 @@ system("aplay /home/pi/online.wav")
 system('{0} audacious -H &'.format(env))
 #sleep(3)
 
-for i in range(0,5):
-    if i < 4:
+for i in range(0,9):
+    if i < 8:
         try:
            if check_output(["ps aux | grep audacious | grep -v grep"], shell=True):
               GPIO.output(26, GPIO.HIGH)
               break
         except:
-              sleep(1)
+              sleep(0.5)
               pass
     else:
         #print('error')
+        system("{0} audtool shutdown".format(env))  #kill audacious (shouldn't matter if it isn't running).
         system("aplay /home/pi/failure.wav")
         system("sudo reboot")
 		
