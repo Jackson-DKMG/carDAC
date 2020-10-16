@@ -133,7 +133,7 @@ class displaySong(Thread):
                     # got room for 12 characters with this font, and 4 rows. Split each string to occupy 2 rows if length is more than 12.
                     if len(band) > 12:
                         band1 = band[0:12]
-                        if band[11] == ' ':   #the 11th character is a space, somewho the next one is left out.
+                        if band[11] == ' ':   #if the 11th character is a space, somehow the next one is left out.
                             band2 = band[12:24]  # if longer than 24 characters, will be truncated anyway, no point keeping the extra stuff.
                         else:
                             band2 = band[13:24]
@@ -172,7 +172,7 @@ class displaySong(Thread):
 
                 pass
 
-            sleep(5)
+            sleep(3) #let's update every 3s instead of 5, shouldn't put too much strain on the CPU.
 
 try:
     displaySong = displaySong()  # start the thread
@@ -234,8 +234,7 @@ def manualSongUpdate():
     except:  #if any exception (like the display being used by the automatic update thread), just abort. Will update 5s later anyway.
         pass
 
-
-playlistLength = int(check_output(["{0} audtool playlist-length".format(env)], shell=True).decode('utf_8').rstrip())
+playlistLength = int(check_output(["{0} audtool playlist-length".format(env)], shell=True).decode('utf_8').rstrip()) #self explanatory, yes ?
 
 #check_output(["{0} audtool playlist-length".format(env)], stderr=STDOUT, shell=True)
 
@@ -262,8 +261,9 @@ def addTracks(playlist):    #check if new music files available, move to general
             f = f.replace(path, newPath)
            # print(f)
             system("{0} audtool playlist-addurl '{1}'".format(env,f))
+            global playlistLength
             playlistLength = int(check_output(["{0} audtool playlist-length".format(env)], shell=True).decode('utf_8').rstrip())  #need to update the playliste length
-
+            #not sure this is right. Need to verify and perhaps make the variable global.
     except:
         pass  #if there are no files to add, it will raise an exception that we should ignore.
 
@@ -300,6 +300,7 @@ def button1(channel):
 
 def button2(channel):   #PREVIOUS
     #print("button 2")
+    global playlistLength
     for i in range(0,30):
         sleep(0.05)
        # print(i)
@@ -317,11 +318,13 @@ def button2(channel):   #PREVIOUS
         elif i == 29:                  #on very long press, jump to first item in playlist
                 system("{0} audtool playlist-jump 1".format(env))
                 break
-    #update the display manually. It may collide with the update thread however, to check.
-    manualSongUpdate()
+    #update the display manually. It may collide with the update thread however, to check. -- yes, it does. Disable.
+    #manualSongUpdate()
+
 
 def button3(channel):   #NEXT
     #print("button 3")
+    global playlistLength
     for i in range(0,30):
         sleep(0.05)
         if GPIO.input(22) != 0:
@@ -338,10 +341,11 @@ def button3(channel):   #NEXT
         elif i == 29:                  #on very long press, jump to last item in playlist
                 system("{0} audtool playlist-jump {1}".format(env, playlistLength))
                 break
-    manualSongUpdate()
+    #manualSongUpdate()
 
 def button4(channel):
     #print("button 4")
+    global playlistLength
     for i in range(0,40):
         sleep(0.05)
      #   print(i)
@@ -361,7 +365,10 @@ def button4(channel):
                 system("{0} audtool set-current-playlist {1}".format(env, playlist))
                 system("{0} audtool playback-playpause".format(env))
 
-                manualSongUpdate()
+            #update the playlist length variable with that of the other playlist.
+                playlistLength = int(check_output(["{0} audtool playlist-length".format(env)], shell=True).decode('utf_8').rstrip())
+
+            #manualSongUpdate()
 
                 try:            #not sure this try block is useful, there is one in the function itself.
                    addTracks(playlist)
