@@ -43,10 +43,10 @@ except:
 GPIO.setwarnings(False)
 #GPIO.setmode(GPIO.BOARD)
 
-GPIO.setup(17, GPIO.IN, pull_up_down=GPIO.PUD_UP)   #play/pause  longpress = stop, very long press = reboot
-GPIO.setup(27, GPIO.IN, pull_up_down=GPIO.PUD_UP)   #previous, longpress = position - 10 ?
-GPIO.setup(22, GPIO.IN, pull_up_down=GPIO.PUD_UP)   #next, longpress = position + 10
-GPIO.setup(23, GPIO.IN, pull_up_down=GPIO.PUD_UP)   #toggle shuffle  longpress = switch playlist, very long press = shutdown
+GPIO.setup(17, GPIO.IN, pull_up_down=GPIO.PUD_UP)   #play/pause,  longpress = stop, very long press = reboot
+GPIO.setup(27, GPIO.IN, pull_up_down=GPIO.PUD_UP)   #previous, longpress = position - 10, very long press = go to last song
+GPIO.setup(22, GPIO.IN, pull_up_down=GPIO.PUD_UP)   #next, longpress = position + 10, very long press = go to first song
+GPIO.setup(23, GPIO.IN, pull_up_down=GPIO.PUD_UP)   #toggle shuffle, longpress = switch playlist, very long press = shutdown
 GPIO.setup(26, GPIO.OUT)
 GPIO.output(26, GPIO.LOW)
 

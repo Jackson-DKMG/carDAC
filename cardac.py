@@ -39,10 +39,10 @@ draw.text((x + 5, top + 20), 'INITIALIZING', font=font3, fill=255)
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BOARD)
 
-GPIO.setup(11, GPIO.IN, pull_up_down=GPIO.PUD_UP)   #play/pause  longpress = stop, very long press = reboot
-GPIO.setup(13, GPIO.IN, pull_up_down=GPIO.PUD_UP)   #previous, longpress = position - 10 ?
-GPIO.setup(15, GPIO.IN, pull_up_down=GPIO.PUD_UP)   #next, longpress = position + 10
-GPIO.setup(16, GPIO.IN, pull_up_down=GPIO.PUD_UP)   #toggle shuffle  longpress = switch playlist, very long press = shutdown
+GPIO.setup(11, GPIO.IN, pull_up_down=GPIO.PUD_UP)   #play/pause, longpress = stop, very long press = reboot
+GPIO.setup(13, GPIO.IN, pull_up_down=GPIO.PUD_UP)   #previous, longpress = position - 10, very long press = go to last song
+GPIO.setup(15, GPIO.IN, pull_up_down=GPIO.PUD_UP)   #next, longpress = position + 10, very long press = go to first song
+GPIO.setup(16, GPIO.IN, pull_up_down=GPIO.PUD_UP)   #toggle shuffle, longpress = switch playlist, very long press = shutdown
 GPIO.setup(37, GPIO.OUT)
 GPIO.output(37, GPIO.LOW)
 
